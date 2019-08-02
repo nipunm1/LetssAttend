@@ -1,6 +1,7 @@
 package com.example.letssattend;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -14,10 +15,18 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class LogInActivity extends AppCompatActivity {
@@ -26,6 +35,7 @@ private FirebaseAuth mAuth;
 TextInputEditText text,text2;
 Button btn;
 TextView textView,textView2;
+CallbackManager callbackManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,5 +113,55 @@ TextView textView,textView2;
                         }
                     }
                 });
+    }
+    public void fbLogin(View view){
+        Log.d(TAG, "fblogin btn");
+        callbackManager = CallbackManager.Factory.create();
+        final LoginButton loginButton = findViewById(R.id.login_button);
+        loginButton.setReadPermissions("email","public_profile");
+        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Log.d(TAG, "FACEBOOK:"+loginResult);
+                fbAccessToken(loginResult.getAccessToken());
+            }
+
+            @Override
+            public void onCancel() {
+                Log.d(TAG, "Fb Login : cancel");
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Log.d(TAG, "Fb login : error");
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void fbAccessToken(AccessToken accessToken){
+        Log.d(TAG, "fbAccessToken: "+accessToken);
+        AuthCredential credential = FacebookAuthProvider.getCredential(accessToken.getToken());
+        mAuth.signInWithCredential(credential).addOnCompleteListener(LogInActivity.this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(task.isSuccessful()){
+                    Log.d(TAG, "Success sign in with credential");
+                    Intent intent = new Intent(LogInActivity.this, HomeActivity.class);
+                    startActivity(intent);
+                    finish();
+                    Toast.makeText(LogInActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    Log.d(TAG, "Some error:"+task.getException().getMessage());
+                    Toast.makeText(LogInActivity.this,"Error : "+task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 }

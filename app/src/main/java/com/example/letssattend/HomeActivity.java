@@ -4,6 +4,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.facebook.AccessToken;
+import com.facebook.login.LoginManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -31,11 +33,13 @@ public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG="HomeActivity";
     private FirebaseAuth mAuth;
+    private LoginManager loginManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         mAuth = FirebaseAuth.getInstance();
+        loginManager = LoginManager.getInstance();
         Toolbar toolbar = findViewById(R.id.toolbar);
         //toolbar.setTitle("Welcome "+mAuth.getCurrentUser().getEmail().toString());
         setSupportActionBar(toolbar);
@@ -109,33 +113,37 @@ public class HomeActivity extends AppCompatActivity
         }
         else if(id == R.id.nav_logout){
             Log.d(TAG, "logout nav btn");
-            AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
-            builder.setTitle("WARNING!!!!");
-            builder.setMessage("Are you sure you want to Logout?");
-            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    Log.d(TAG, "Postive Yes");
-                    mAuth.signOut();
-                    Intent intent = new Intent(HomeActivity.this,LogInActivity.class);
-                    startActivity(intent);
-                    finish();
-                    Log.d(TAG, "logout successfully");
-                    Toast.makeText(HomeActivity.this, "Logout Successfully", Toast.LENGTH_SHORT).show();
-                }
-            });
-            builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    Log.d(TAG, "Negative No");
-                }
-            });
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            logoutDialog();
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+    private void logoutDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
+        builder.setTitle("WARNING!!!!");
+        builder.setMessage("Are you sure you want to Logout?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Log.d(TAG, "Postive Yes");
+                mAuth.signOut();//For email and password auth logout
+                loginManager.logOut();//For facebook logout
+                Intent intent = new Intent(HomeActivity.this,LogInActivity.class);
+                startActivity(intent);
+                finish();
+                Log.d(TAG, "logout successfully");
+                Toast.makeText(HomeActivity.this, "Logout Successfully", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Log.d(TAG, "Negative No");
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }

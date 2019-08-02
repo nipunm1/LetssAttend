@@ -66,4 +66,5 @@
         android:id="@+id/logintext"
         android:layout_marginTop="15dp"
         android:layout_height="wrap_content" />
+
 </LinearLayout>
