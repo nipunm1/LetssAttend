@@ -15,6 +15,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.letssattend.util.Constants;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -28,6 +29,12 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class LogInActivity extends AppCompatActivity {
 private static final String TAG="LogInActivity";
@@ -36,6 +43,8 @@ TextInputEditText text,text2;
 Button btn;
 TextView textView,textView2;
 CallbackManager callbackManager;
+FirebaseDatabase database;
+DatabaseReference dbreference;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +55,8 @@ CallbackManager callbackManager;
         btn = findViewById(R.id.loginbtn);
         textView = findViewById(R.id.registertext);
         textView2 = findViewById(R.id.forgetpasstext);
+        database = FirebaseDatabase.getInstance();
+        dbreference = database.getReference(Constants.STUDENT);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -95,12 +106,23 @@ CallbackManager callbackManager;
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
-                            if(mAuth.getCurrentUser().isEmailVerified()) {
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            if(user.isEmailVerified()) {
                                 Log.d(TAG, "Successfully LogedIn");
-                                Intent intent = new Intent(LogInActivity.this, HomeActivity.class);
-                                startActivity(intent);
-                                finish();
-                                Toast.makeText(LogInActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
+                                dbreference.child(user.getUid()).addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        Intent intent = new Intent(LogInActivity.this, HomeActivity.class);
+                                        startActivity(intent);
+                                        finish();
+                                        Toast.makeText(LogInActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                                        Log.d(TAG, "Student details error"+databaseError.getMessage());
+                                    }
+                                });
                             }
                             else{
                                 Log.d(TAG, "Email not Verified");
@@ -114,6 +136,7 @@ CallbackManager callbackManager;
                     }
                 });
     }
+
     public void fbLogin(View view){
         Log.d(TAG, "fblogin btn");
         callbackManager = CallbackManager.Factory.create();

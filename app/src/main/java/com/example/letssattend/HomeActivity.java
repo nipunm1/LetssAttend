@@ -6,12 +6,14 @@ import android.os.Bundle;
 
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -30,7 +32,7 @@ import android.view.Menu;
 import android.widget.Toast;
 
 public class HomeActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener{
     private static final String TAG="HomeActivity";
     private FirebaseAuth mAuth;
     private LoginManager loginManager;
@@ -43,6 +45,21 @@ public class HomeActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         //toolbar.setTitle("Welcome "+mAuth.getCurrentUser().getEmail().toString());
         setSupportActionBar(toolbar);
+        BottomNavigationView navView = findViewById(R.id.nav_bottom_view);
+        navView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.navigation_home:
+                        return true;
+                    case R.id.navigation_dashboard:
+                        return true;
+                    case R.id.navigation_notifications:
+                        return true;
+                }
+                return false;
+            }
+        });
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
