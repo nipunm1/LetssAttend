@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.example.letssattend.util.Constants;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -22,6 +23,12 @@ import android.view.MenuItem;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -29,6 +36,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class HomeActivity extends AppCompatActivity
@@ -36,6 +44,10 @@ public class HomeActivity extends AppCompatActivity
     private static final String TAG="HomeActivity";
     private FirebaseAuth mAuth;
     private LoginManager loginManager;
+    TextView textView,textView2;
+    FirebaseDatabase database;
+    NavigationView navigationView;
+    DatabaseReference reference;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +55,13 @@ public class HomeActivity extends AppCompatActivity
         mAuth = FirebaseAuth.getInstance();
         loginManager = LoginManager.getInstance();
         Toolbar toolbar = findViewById(R.id.toolbar);
+        database = FirebaseDatabase.getInstance();
+        reference = database.getReference(Constants.STUDENT);
+        navigationView = findViewById(R.id.nav_view);
+        View headerView = navigationView.getHeaderView(0);
+        textView = headerView.findViewById(R.id.textViewUseName);
+        textView2 = headerView.findViewById(R.id.textViewUserEmail);
+        setOnNavHeader();
         //toolbar.setTitle("Welcome "+mAuth.getCurrentUser().getEmail().toString());
         setSupportActionBar(toolbar);
         BottomNavigationView navView = findViewById(R.id.nav_bottom_view);
@@ -76,7 +95,25 @@ public class HomeActivity extends AppCompatActivity
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
     }
+    private void setOnNavHeader(){
+        Log.d(TAG, "set On Nav Header Function");
+        String uid = mAuth.getCurrentUser().getUid();
+        reference.child(uid).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.d(TAG, "onDataChange Function");
+                String name = (String) dataSnapshot.child("name").getValue();
+                textView.setText(name);
+                String email = (String) dataSnapshot.child("email").getValue();
+                textView2.setText(email);
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d(TAG, "onCancelled Function");
+            }
+        });
+    }
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
