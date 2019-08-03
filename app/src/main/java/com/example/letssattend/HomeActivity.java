@@ -2,8 +2,12 @@ package com.example.letssattend;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
+import com.example.letssattend.Fragments.DashboardFragment;
+import com.example.letssattend.Fragments.HomeFragment;
+import com.example.letssattend.Fragments.NotificationFragment;
 import com.example.letssattend.util.Constants;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
@@ -34,13 +38,16 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.view.Menu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class HomeActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener{
+        implements NavigationView.OnNavigationItemSelectedListener, HomeFragment.OnFragmentInteractionListener,DashboardFragment.OnFragmentInteractionListener,NotificationFragment.OnFragmentInteractionListener {
     private static final String TAG="HomeActivity";
     private FirebaseAuth mAuth;
     private LoginManager loginManager;
@@ -70,10 +77,13 @@ public class HomeActivity extends AppCompatActivity
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.navigation_home:
+                        setFragment(HomeFragment.newInstance("",""));
                         return true;
                     case R.id.navigation_dashboard:
+                        setFragment(DashboardFragment.newInstance("",""));
                         return true;
                     case R.id.navigation_notifications:
+                        setFragment(NotificationFragment.newInstance("", ""));
                         return true;
                 }
                 return false;
@@ -94,6 +104,12 @@ public class HomeActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
+    }
+    private void setFragment(Fragment fragment){
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.replace(R.id.container, fragment);
+        transaction.commit();
     }
     private void setOnNavHeader(){
         Log.d(TAG, "set On Nav Header Function");
@@ -199,5 +215,10 @@ public class HomeActivity extends AppCompatActivity
         });
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }
