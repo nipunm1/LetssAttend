@@ -1,7 +1,19 @@
 package com.example.letssattend.model;
 
 public class Attendance {
-    String date,time,userid,name,course,date_userid;
+    String date;
+    String time;
+    String userid;
+    String name;
+
+    public Attendance(String date, String time, String userid, String name, String course, String date_userid) {
+        this.date = date;
+        this.time = time;
+        this.userid = userid;
+        this.name = name;
+        this.course = course;
+        this.date_userid = date_userid;
+    }
 
     @Override
     public String toString() {
@@ -13,15 +25,6 @@ public class Attendance {
                 ", course='" + course + '\'' +
                 ", date_userid='" + date_userid + '\'' +
                 '}';
-    }
-
-    public Attendance(String date, String time, String userid, String name, String course, String date_userid) {
-        this.date = date;
-        this.time = time;
-        this.userid = userid;
-        this.name = name;
-        this.course = course;
-        this.date_userid = date_userid;
     }
 
     public String getDate() {
@@ -71,4 +74,8 @@ public class Attendance {
     public void setDate_userid(String date_userid) {
         this.date_userid = date_userid;
     }
+
+    String course;
+    String date_userid;
+
 }

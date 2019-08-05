@@ -42,8 +42,7 @@ public class HomeFragment extends Fragment {
     FirebaseAuth auth;
     FirebaseDatabase database;
     DatabaseReference attend_ref;
-    String name;
-    String course;
+
     private OnFragmentInteractionListener mListener;
 
     public HomeFragment() {
@@ -107,20 +106,15 @@ public class HomeFragment extends Fragment {
 
     private void markAttendance(){
         Log.d(TAG, "markAttendance function");
-        String date;
-        String year;
-        String month;
-        String day;
-        String time;
-        String uid;
-        uid = auth.getInstance().getCurrentUser().getUid();
+        String uid = auth.getInstance().getCurrentUser().getUid();
         DatabaseReference stud_ref = database.getReference(Constants.STUDENT);
         stud_ref.child(uid).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Log.d(TAG, "Getting name and course");
-                name = (String)(dataSnapshot.child("name").getValue());
-                course = (String)(dataSnapshot.child("course").getValue());
+                String name = (String)(dataSnapshot.child("name").getValue());
+                String course = (String)(dataSnapshot.child("course").getValue());
+                attendDetails(name,course);
             }
 
             @Override
@@ -128,6 +122,16 @@ public class HomeFragment extends Fragment {
                 Log.d(TAG, "Fail to get name and course");
             }
         });
+
+    }
+    private void attendDetails(String name,String course){
+        Log.d(TAG, "attendDetails");
+        String date;
+        String year;
+        String month;
+        String day;
+        String time;
+        String uid = auth.getInstance().getCurrentUser().getUid();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd/HH:mm:ss");
         String currentDateAndTime = simpleDateFormat.format(new Date());
         String[] arr = currentDateAndTime.split("/");
