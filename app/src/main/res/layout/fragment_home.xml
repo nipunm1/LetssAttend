@@ -4,11 +4,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Fragments.HomeFragment">
-
+<LinearLayout
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent">
     <TextView
         android:layout_width="match_parent"
-        android:textSize="20dp"
-        android:text="HELLO"
-        android:gravity="center"
-        android:layout_height="match_parent" />
+        android:text="Welcome"
+        android:textSize="35dp"
+        android:id="@+id/text"
+        android:gravity="center_horizontal"
+        android:textColor="#5E35B1"
+        android:textStyle="bold"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/text2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="Today is"
+        android:textColor="#000"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:id="@+id/button"
+        android:layout_gravity="center_horizontal"
+        android:text="Mark Your Attendance"
+        android:backgroundTint="#f0f0"
+        android:layout_margin="50dp"
+        android:layout_height="wrap_content" />
+</LinearLayout>
 </FrameLayout>

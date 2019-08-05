@@ -72,6 +72,7 @@ public class HomeActivity extends AppCompatActivity
         //toolbar.setTitle("Welcome "+mAuth.getCurrentUser().getEmail().toString());
         setSupportActionBar(toolbar);
         BottomNavigationView navView = findViewById(R.id.nav_bottom_view);
+        setFragment(HomeFragment.newInstance("",""));
         navView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
