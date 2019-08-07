@@ -5,7 +5,9 @@ public class Attendance {
     String time;
     String userid;
     String name;
+    public Attendance(){
 
+    }
     public Attendance(String date, String time, String userid, String name, String course, String date_userid) {
         this.date = date;
         this.time = time;

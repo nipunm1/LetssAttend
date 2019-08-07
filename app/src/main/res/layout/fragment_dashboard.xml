@@ -5,10 +5,61 @@
     android:layout_height="match_parent"
     tools:context=".Fragments.DashboardFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
-
+        android:orientation="vertical"
+        android:layout_height="match_parent">
+        <TextView
+            android:layout_width="match_parent"
+            android:text="Check your Attendance"
+            android:textStyle="bold"
+            android:textColor="#34580D"
+            android:gravity="center_horizontal"
+            android:textSize="20dp"
+            android:layout_height="wrap_content" />
+        <LinearLayout
+            android:layout_margin="20dp"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+            <TextView
+                android:textSize="15dp"
+                android:layout_marginLeft="20dp"
+                android:textStyle="normal"
+                android:textColor="#000"
+                android:layout_width="wrap_content"
+                android:text="From:"
+                android:layout_height="wrap_content" />
+            <Button
+                android:layout_width="wrap_content"
+                android:id="@+id/button"
+                android:text="Pick Date"
+                android:layout_marginLeft="10dp"
+                android:layout_height="wrap_content" />
+            <TextView
+            android:layout_width="wrap_content"
+            android:textColor="#000"
+            android:textSize="15dp"
+            android:layout_marginLeft="20dp"
+            android:text="To:"
+            android:layout_height="wrap_content" />
+            <Button
+                android:layout_width="wrap_content"
+                android:id="@+id/button2"
+                android:text="Pick Date"
+                android:layout_marginLeft="10dp"
+                android:layout_height="wrap_content" />
+            <ImageButton
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:scaleType="center"
+                android:id="@+id/imgbutton"
+                android:layout_width="wrap_content"
+                android:src="@drawable/ic_search"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <ListView
+            android:layout_width="match_parent"
+            android:id="@+id/listView"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
 </FrameLayout>
