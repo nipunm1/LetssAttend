@@ -1,6 +1,6 @@
 package com.example.letssattend.model;
 
-public class Attendance {
+public class Attendance implements Comparable<Attendance>{
     String date;
     String time;
     String userid;
@@ -80,4 +80,8 @@ public class Attendance {
     String course;
     String date_userid;
 
+    @Override
+    public int compareTo(Attendance attendance) {
+        return this.date.compareTo(attendance.getDate());
+    }
 }

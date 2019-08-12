@@ -2,6 +2,7 @@ package com.example.letssattend.Fragments;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,9 +16,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.letssattend.R;
 import com.example.letssattend.model.Attendance;
@@ -30,21 +34,26 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
-public class DashboardFragment extends Fragment implements View.OnClickListener{
+public class DashboardFragment extends Fragment{
     private static final String TAG="DashboardFragment";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
     private String mParam1;
     private String mParam2;
+    String date1;
+    String date2;
 
     MyAdapter myAdapter;
 
     Button btn,btn2;
     ImageButton imgbtn;
     ListView lv;
+    ArrayList<Attendance>filter_list = new ArrayList<>();
     ArrayList<Attendance>attend_list = new ArrayList<>();
     FirebaseAuth mAuth;
     FirebaseDatabase database;
@@ -82,14 +91,88 @@ public class DashboardFragment extends Fragment implements View.OnClickListener{
         btn2 = view.findViewById(R.id.button2);
         imgbtn = view.findViewById(R.id.imgbutton);
         lv = (ListView) view.findViewById(R.id.listView);
-        btn.setOnClickListener(this);
-        btn2.setOnClickListener(this);
-        imgbtn.setOnClickListener(this);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "From button clicked");
+                DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
+                        Log.d(TAG, "FROM DATA SET"+i+i1+i2);
+                        String month = String.format("%02d", i1+1);
+                        String day = String.format("%02d", i2);
+                        int year = i;
+                        date1 = day+"-"+month+"-"+year;
+                        btn.setText(date1+"");
+                        date1=year+""+month+""+day+"";
+                        Log.d(TAG, "date1 = "+date1);
+                    }
+                };
+                getCurrentDate(listener);
+            }
+        });
+        btn2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "To button clicked");
+                DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
+                        Log.d(TAG, "TO DATA SET"+i+i1+i2);
+                        String month = String.format("%02d", i1+1);
+                        String day = String.format("%02d", i2);
+                        int year = i;
+                        date2 = day+"-"+month+"-"+year;
+                        btn2.setText(date2+"");
+                        date2=year+""+month+""+day+"";
+                        Log.d(TAG, "date2 = "+date2);
+                    }
+                };
+                getCurrentDate(listener);
+            }
+        });
+        imgbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "Search button clicked");
+                if(date1==null){
+                    Toast.makeText(getContext(), "Please enter From date", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                if(date2==null){
+                    Toast.makeText(getContext(), "Please enter To date", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                getAttendByDate(date1, date2);
+            }
+        });
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         attend_dbrefer = database.getReference(Constants.ATTENDENCE);
         getFullAttendance();
         return view;
+    }
+    private void getAttendByDate(String d1,String d2){
+        Log.d(TAG, "getAttendByDate function "+ d1 + d2);
+        filter_list.clear();
+        for(Attendance attendance : attend_list){
+            if(attendance.getDate().compareTo(d1)>=0&&attendance.getDate().compareTo(d2)<=0){
+                filter_list.add(attendance);
+                Log.d(TAG, "filtered list according to date = "+filter_list);
+            }
+        }
+        MyAdapter myAdapter = new MyAdapter(getContext(), filter_list);
+        lv.setAdapter(myAdapter);
+        myAdapter.notifyDataSetChanged();
+    }
+    private void getCurrentDate(DatePickerDialog.OnDateSetListener listener){
+        Calendar calendar = Calendar.getInstance();
+        int year= calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), R.style.Theme_AppCompat_Light_Dialog_Alert, listener, year, month, day);
+        datePickerDialog.getDatePicker().setMaxDate(calendar.getTimeInMillis());
+        datePickerDialog.show();
     }
     private void getFullAttendance(){
         Log.d(TAG, "Get Full Attendance");
@@ -123,18 +206,6 @@ public class DashboardFragment extends Fragment implements View.OnClickListener{
                     Log.d(TAG, "Data cancelled "+databaseError.getMessage());
             }
         });
-    }
-    @Override
-    public void onClick(View view) {
-        int id = view.getId();
-        switch (id){
-            case R.id.button:
-                Log.d(TAG, "From Button date clicked");
-            case R.id.button2:
-                Log.d(TAG, "To Button date clicked");
-            case R.id.imgbutton:
-                Log.d(TAG, "Search Button Clicked");
-        }
     }
 
     public void onButtonPressed(Uri uri) {
